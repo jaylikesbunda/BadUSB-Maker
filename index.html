@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>BadUSB Maker v0.1</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app">
+        <header>
+            <h1>BadUSB Maker v0.1</h1>
+            <div id="toolbar">
+                <button id="new-script">New Script</button>
+                <button id="load-example">Load Example</button>
+                <button id="generate-script">Generate Script</button>
+                <button id="help-button">Help</button>
+            </div>
+        </header>
+        <main id="main-container">
+            <div id="node-panel">
+                <h2>Commands</h2>
+                <div id="node-list">
+                    <!-- Commands dynamically loaded -->
+                </div>
+            </div>
+            <div id="workspace-container">
+                <canvas id="connection-layer"></canvas> <!-- Layer for connections -->
+                <div id="workspace">
+                    <!-- Workspace for nodes -->
+                </div>
+            </div>
+        </main>
+        <div id="output-section">
+            <h2>Generated Script</h2>
+            <textarea id="output" rows="10" readonly></textarea>
+            <button id="copy-script">Copy to Clipboard</button>
+            <button id="download-script">Download Script</button>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div id="modal-background"></div>
+    <div id="help-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="close-help-modal">&times;</span>
+            <h2>Help</h2>
+            <div id="help-content">
+                <!-- Help content dynamically loaded -->
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script type="module" src="main.js"></script>
+</body>
+</html>

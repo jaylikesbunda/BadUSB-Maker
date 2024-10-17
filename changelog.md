@@ -1,4 +1,6 @@
-BadUSB Maker v0.2
+BadUSB Maker Changelog
+--------------------------
+v0.2
 - added delete button to nodes
 - improved temp connection coord calculation
 - separate clusters and commands

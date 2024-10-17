@@ -6,7 +6,7 @@ BadUSB Maker is a web-based tool for creating and editing BadUSB scripts using a
 
 You can try out the BadUSB Maker here: [https://jaylikesbunda.github.io/BadUSB-Maker/](https://jaylikesbunda.github.io/BadUSB-Maker/)
 
-## ✨ Features
+## Features
 
 - Visual node-based interface for creating BadUSB scripts
 - Drag-and-drop functionality for easy script creation
@@ -17,7 +17,11 @@ You can try out the BadUSB Maker here: [https://jaylikesbunda.github.io/BadUSB-M
 - Copy generated script to clipboard or download as a file
 - Responsive design for use on various devices
 
-## 🚀 How to Use
+## Changelog
+
+For a detailed list of changes and updates, please see the [Changelog](https://github.com/jaylikesbunda/BadUSB-Maker/blob/main/changelog.txt).
+
+## How to Use
 
 1. **Add Nodes**: Drag command nodes or cluster nodes from the left panel into the workspace.
 2. **Connect Nodes**: Click and drag from one node's output connector to another node's input connector to create a sequence.
@@ -25,7 +29,7 @@ You can try out the BadUSB Maker here: [https://jaylikesbunda.github.io/BadUSB-M
 4. **Generate Script**: Click the "Generate Script" button to see the resulting BadUSB script.
 5. **Copy or Download**: Use the "Copy to Clipboard" or "Download Script" buttons to save your work.
 
-## 🛠️ Commands
+## Commands
 
 BadUSB Maker supports a wide range of commands, including:
 
@@ -45,7 +49,7 @@ Clusters are pre-defined groups of commands for common operations, such as:
 - Taking screenshots
 - And more!
 
-## 💡 Tips
+## Tips
 
 - Use the "Load Example" button to see pre-made scripts and learn how to structure your own.
 - Hover over nodes to see descriptions of what each command does.

@@ -4,6 +4,7 @@ import { uiElements } from './uiElements.js';
 import { commands } from './commands.js';
 import { createNodeInstance } from './nodeInstance.js';
 import { createConnection } from './connections.js';
+import { updateAllConnections } from './connections.js';
 
 export function initializeScriptGeneration() {
     uiElements.generateButton.addEventListener('click', function () {
@@ -95,7 +96,6 @@ function initializeExampleSelector() {
 
 function loadExampleScript(exampleName) {
     clearWorkspace();
-
     switch (exampleName) {
         case 'openWebsiteWindows':
             loadOpenWebsiteWindowsExample();
@@ -111,9 +111,28 @@ function loadExampleScript(exampleName) {
             break;
         default:
             console.error('Unknown example:', exampleName);
+            return;
     }
+    
+    // After loading any example, update node positions and refresh connections
+    setTimeout(refreshNodePositionsAndConnections, 50);
 }
 
+function refreshNodePositionsAndConnections() {
+    updateNodePositions();
+    updateAllConnections();
+}
+
+function updateNodePositions() {
+    const workspaceRect = uiElements.workspace.getBoundingClientRect();
+    data.nodes.forEach(node => {
+        if (node.element) {
+            const rect = node.element.getBoundingClientRect();
+            node.x = (rect.left - workspaceRect.left) / data.scale;
+            node.y = (rect.top - workspaceRect.top) / data.scale;
+        }
+    });
+}
 
 function loadOpenWebsiteWindowsExample() {
     const cmds = [

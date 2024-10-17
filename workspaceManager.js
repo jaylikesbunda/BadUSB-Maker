@@ -1,5 +1,6 @@
 // workspaceManager.js
 import { uiElements } from './uiElements.js';
+import data from './dataStructures.js';
 
 let scale = 1;
 let panX = 0;
@@ -14,10 +15,11 @@ function setupZoom() {
     uiElements.workspace.addEventListener('wheel', (e) => {
         e.preventDefault();
         const delta = e.deltaY > 0 ? 0.9 : 1.1;
-        scale *= delta;
-        scale = Math.max(0.1, Math.min(scale, 5)); // Limit zoom level
-        uiElements.workspace.style.transform = `scale(${scale}) translate(${panX}px, ${panY}px)`;
+        data.scale *= delta;
+        data.scale = Math.max(0.1, Math.min(data.scale, 5)); // Limit zoom level
+        updateWorkspaceTransform();
         updateBackgroundSize();
+        updateAllConnections(); // Add this line
     });
 }
 
@@ -55,16 +57,20 @@ function updateBackgroundSize() {
     uiElements.workspace.style.backgroundSize = `${newSize}px ${newSize}px`;
 }
 
+export function updateWorkspaceTransform() {
+    uiElements.workspace.style.transform = `scale(${data.scale}) translate(${data.panX / data.scale}px, ${data.panY / data.scale}px)`;
+}
+
 export function screenToWorkspaceCoordinates(x, y) {
     return {
-        x: (x - panX) / scale,
-        y: (y - panY) / scale
+        x: (x - data.panX) / data.scale,
+        y: (y - data.panY) / data.scale
     };
 }
 
 export function workspaceToScreenCoordinates(x, y) {
     return {
-        x: x * scale + panX,
-        y: y * scale + panY
+        x: x * data.scale + data.panX,
+        y: y * data.scale + data.panY
     };
 }

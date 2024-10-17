@@ -2,13 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>BadUSB Maker v0.1.5</title>
+    <title>BadUSB Maker v0.2</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div id="app">
         <header>
-            <h1>BadUSB Maker v0.1.5</h1>
+            <h1>BadUSB Maker v0.2</h1>
             <div id="toolbar">
                 <button id="new-script">New Script</button>
                 <button id="load-example">Load Example</button>
@@ -18,11 +18,15 @@
         </header>
         <main id="main-container">
             <div id="node-panel">
-                <h2>Commands</h2>
-                <div id="node-list">
-                    <!-- Commands dynamically loaded -->
+                <div id="cluster-list">
+                    <h3>Clusters</h3>
+                    <!-- Cluster commands will be dynamically loaded here -->
                 </div>
-            </div>
+                <div id="command-list">
+                    <h3>Individual Commands</h3>
+                    <!-- Individual commands will be dynamically loaded here -->
+                </div>
+            </div>            
             <div id="workspace-container">
                 <canvas id="connection-layer"></canvas> <!-- Layer for connections -->
                 <div id="workspace">

@@ -23,6 +23,18 @@ export function createNodeCluster(cluster, x, y) {
     title.textContent = cluster.name;
     nodeElement.appendChild(title);
 
+    // Add delete button
+    const deleteButton = document.createElement('div');
+    deleteButton.classList.add('delete-button');
+    deleteButton.innerHTML = '&times;'; // Unicode for "×"
+    deleteButton.addEventListener('click', (event) => {
+        event.stopPropagation();
+        if (confirm('Are you sure you want to delete this cluster?')) {
+            deleteNode(nodeElement.dataset.id);
+        }
+    });
+    nodeElement.appendChild(deleteButton);
+
     // Output connector
     const outputConnector = document.createElement('div');
     outputConnector.classList.add('output-connector');
@@ -66,6 +78,31 @@ export function createNodeCluster(cluster, x, y) {
     });
 }
 
+// Add this function to handle node deletion
+function deleteNode(nodeId) {
+    const node = data.nodes.find(n => n.id == nodeId);
+    if (!node) return;
+
+    // Remove the node element from the DOM
+    if (node.element && node.element.parentNode) {
+        node.element.parentNode.removeChild(node.element);
+    }
+
+    // Remove all connections to and from this node
+    data.connections = data.connections.filter(conn => {
+        if (conn.from == nodeId || conn.to == nodeId) {
+            if (conn.element && conn.element.parentNode) {
+                conn.element.parentNode.removeChild(conn.element);
+            }
+            return false;
+        }
+        return true;
+    });
+
+    // Remove the node from the data structure
+    data.nodes = data.nodes.filter(n => n.id != nodeId);
+}
+
 export function createNodeInstance(cmd, x, y) {
     const nodeElement = document.createElement('div');
     nodeElement.classList.add('node');
@@ -83,6 +120,17 @@ export function createNodeInstance(cmd, x, y) {
     title.classList.add('title');
     title.textContent = cmd.name;
     nodeElement.appendChild(title);
+
+    const deleteButton = document.createElement('div');
+    deleteButton.classList.add('delete-button');
+    deleteButton.innerHTML = '&times;'; // Unicode for "×"
+    deleteButton.addEventListener('click', (event) => {
+        event.stopPropagation();
+        if (confirm('Are you sure you want to delete this node?')) {
+            deleteNode(nodeElement.dataset.id);
+        }
+    });
+    nodeElement.appendChild(deleteButton);
 
     // Output connector
     const outputConnector = document.createElement('div');

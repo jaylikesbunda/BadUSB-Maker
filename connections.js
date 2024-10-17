@@ -50,24 +50,28 @@ function updateTemporaryConnection(mouseX, mouseY) {
     }
 
     const startNode = data.nodes.find(n => n.id == data.connectionStartNode.dataset.id);
-    
+   
     if (!startNode || !startNode.element) {
         console.warn('Start node or its element not found');
         return;
     }
 
-    const startRect = startNode.element.getBoundingClientRect();
     const workspaceRect = uiElements.workspace.getBoundingClientRect();
 
-    const startX = startRect.right - workspaceRect.left;
-    const startY = startRect.top + startRect.height / 2 - workspaceRect.top;
+    // Use the stored x and y values for the start node
+    const startX = startNode.x + startNode.element.offsetWidth;
+    const startY = startNode.y + startNode.element.offsetHeight / 2;
 
+    // Convert mouse position to workspace coordinates
+    const workspaceMouseX = (mouseX - workspaceRect.left) / data.scale - data.panX / data.scale;
+    const workspaceMouseY = (mouseY - workspaceRect.top) / data.scale - data.panY / data.scale;
+
+    // Convert both start and end points to screen coordinates
     const { x: screenStartX, y: screenStartY } = workspaceToScreenCoordinates(startX, startY);
-    const { x: workspaceMouseX, y: workspaceMouseY } = screenToWorkspaceCoordinates(mouseX, mouseY);
+    const { x: screenEndX, y: screenEndY } = workspaceToScreenCoordinates(workspaceMouseX, workspaceMouseY);
 
-    drawConnection(data.temporaryConnection, screenStartX, screenStartY, workspaceMouseX, workspaceMouseY);
+    drawConnection(data.temporaryConnection, screenStartX, screenStartY, screenEndX, screenEndY);
 }
-
 export function completeConnection(targetNode) {
     if (data.connectionStartNode && targetNode !== data.connectionStartNode) {
         const startNodeId = data.connectionStartNode.dataset.id;

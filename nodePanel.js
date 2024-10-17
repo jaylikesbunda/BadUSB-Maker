@@ -1,10 +1,12 @@
-// nodePanel.js
 import { commands } from './commands.js';
 import { nodeClusters } from './nodeClusters.js';
 import { uiElements } from './uiElements.js';
 import { createNodeInstance, createNodeCluster } from './nodeInstance.js';
 
 export function loadCommandsIntoPanel() {
+    const clusterList = document.getElementById('cluster-list');
+    const commandList = document.getElementById('command-list');
+
     // Add cluster items
     nodeClusters.forEach(cluster => {
         const clusterItem = document.createElement('div');
@@ -15,12 +17,8 @@ export function loadCommandsIntoPanel() {
             event.preventDefault();
             createNodeCluster(cluster, event.clientX, event.clientY);
         });
-        uiElements.nodeList.appendChild(clusterItem);
+        clusterList.appendChild(clusterItem);
     });
-
-    // Add a separator
-    const separator = document.createElement('hr');
-    uiElements.nodeList.appendChild(separator);
 
     // Add individual command items
     commands.forEach(cmd => {
@@ -32,6 +30,6 @@ export function loadCommandsIntoPanel() {
             event.preventDefault();
             createNodeInstance(cmd, event.clientX, event.clientY);
         });
-        uiElements.nodeList.appendChild(nodeItem);
+        commandList.appendChild(nodeItem);
     });
 }

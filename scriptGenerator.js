@@ -409,7 +409,6 @@ function downloadScript(content, filename) {
     document.body.removeChild(a);
 }
 
-// Make sure to import these functions from their respective files
 import { selectNode } from './nodeSelection.js';
 import { startDraggingNode } from './nodeDragging.js';
 import { startConnection, completeConnection } from './connections.js';

@@ -1,4 +1,4 @@
-# BadUSB Maker v0.2
+# BadUSB Maker
 
 BadUSB Maker is a web-based tool for creating and editing BadUSB scripts using a visual node-based interface. It allows users to easily construct complex BadUSB sequences without needing to manually write the script.
 

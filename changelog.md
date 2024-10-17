@@ -7,7 +7,7 @@ v0.2
 - css refactoring and small tweaks
 
 v0.3
-- improved relative node spawning relative
+- improved relative node spawning
 - fix delete button not showing on loaded examples
 - allow opening of badusb scripts
 - improved css

@@ -14,21 +14,22 @@ export function initializeWorkspaceManager() {
 function setupZoom() {
     uiElements.workspace.addEventListener('wheel', (e) => {
         e.preventDefault();
-        const delta = e.deltaY > 0 ? 0.9 : 1.1;
-        data.scale *= delta;
-        data.scale = Math.max(0.1, Math.min(data.scale, 5)); // Limit zoom level
+        const delta = e.deltaY > 0 ? -zoomSensitivity : zoomSensitivity;
+        data.scale += delta;
+        data.scale = Math.max(0.2, Math.min(data.scale, 3)); // Limit zoom level
         updateWorkspaceTransform();
         updateBackgroundSize();
-        updateAllConnections(); // Add this line
+        updateAllConnections();
     });
 }
+
 
 function setupPan() {
     let isPanning = false;
     let startX, startY;
 
     uiElements.workspace.addEventListener('mousedown', (e) => {
-        if (e.button === 1 || (e.button === 0 && e.ctrlKey)) { // Middle mouse button or left click + Ctrl
+        if (e.button === 1 || (e.button === 0 && e.ctrlKey)) {
             isPanning = true;
             startX = e.clientX;
             startY = e.clientY;
@@ -39,9 +40,9 @@ function setupPan() {
         if (isPanning) {
             const dx = e.clientX - startX;
             const dy = e.clientY - startY;
-            panX += dx / scale;
-            panY += dy / scale;
-            uiElements.workspace.style.transform = `scale(${scale}) translate(${panX}px, ${panY}px)`;
+            data.panX += dx;
+            data.panY += dy;
+            updateWorkspaceTransform();
             startX = e.clientX;
             startY = e.clientY;
         }
@@ -53,7 +54,7 @@ function setupPan() {
 }
 
 function updateBackgroundSize() {
-    const newSize = 20 * scale;
+    const newSize = 20 * data.scale;
     uiElements.workspace.style.backgroundSize = `${newSize}px ${newSize}px`;
 }
 
@@ -67,6 +68,15 @@ export function screenToWorkspaceCoordinates(x, y) {
         y: (y - data.panY) / data.scale
     };
 }
+
+export function getCurrentTransform() {
+    return { scale: data.scale, x: data.panX, y: data.panY };
+}
+
+export function getScaleAwareOffset(offsetPixels) {
+    return offsetPixels / data.scale;
+}
+
 
 export function workspaceToScreenCoordinates(x, y) {
     return {

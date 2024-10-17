@@ -4,15 +4,19 @@ import { uiElements } from './uiElements.js';
 import { selectNode } from './nodeSelection.js';
 import { startDraggingNode } from './nodeDragging.js';
 import { startConnection, completeConnection } from './connections.js';
-import { screenToWorkspaceCoordinates } from './workspaceManager.js';
+import { screenToWorkspaceCoordinates, getCurrentTransform, getScaleAwareOffset } from './workspaceManager.js';
 
-export function createNodeCluster(cluster, x, y) {
+const SPAWN_OFFSET_X = 500; // pixels
+
+export function createNodeCluster(cluster, mouseX, mouseY) {
+    const { x, y } = screenToWorkspaceCoordinates(mouseX, mouseY);
+    const scaleAwareOffset = getScaleAwareOffset(SPAWN_OFFSET_X);
+    
     const nodeElement = document.createElement('div');
     nodeElement.classList.add('node', 'cluster-node');
    
-    const workspaceCoords = screenToWorkspaceCoordinates(x, y);
-    nodeElement.style.left = workspaceCoords.x + 'px';
-    nodeElement.style.top = workspaceCoords.y + 'px';
+    nodeElement.style.left = (x + scaleAwareOffset) + 'px';
+    nodeElement.style.top = y + 'px';
    
     nodeElement.dataset.id = data.nodeIdCounter++;
     nodeElement.dataset.cluster = cluster.name;
@@ -66,15 +70,14 @@ export function createNodeCluster(cluster, x, y) {
 
     uiElements.workspace.appendChild(nodeElement);
 
-    // Add to nodes array
     data.nodes.push({
         id: nodeElement.dataset.id,
         element: nodeElement,
         cluster: cluster.name,
         nodes: cluster.nodes,
         outputs: [],
-        x: workspaceCoords.x,
-        y: workspaceCoords.y
+        x: x + scaleAwareOffset,
+        y: y
     });
 }
 
@@ -103,14 +106,15 @@ function deleteNode(nodeId) {
     data.nodes = data.nodes.filter(n => n.id != nodeId);
 }
 
-export function createNodeInstance(cmd, x, y) {
+export function createNodeInstance(cmd, mouseX, mouseY) {
+    const { x, y } = screenToWorkspaceCoordinates(mouseX, mouseY);
+    const scaleAwareOffset = getScaleAwareOffset(SPAWN_OFFSET_X);
+    
     const nodeElement = document.createElement('div');
     nodeElement.classList.add('node');
    
-    // Convert screen coordinates to workspace coordinates
-    const workspaceCoords = screenToWorkspaceCoordinates(x, y);
-    nodeElement.style.left = workspaceCoords.x + 'px';
-    nodeElement.style.top = workspaceCoords.y + 'px';
+    nodeElement.style.left = (x + scaleAwareOffset) + 'px';
+    nodeElement.style.top = y + 'px';
    
     nodeElement.dataset.id = data.nodeIdCounter++;
     nodeElement.dataset.command = cmd.name;
@@ -184,14 +188,13 @@ export function createNodeInstance(cmd, x, y) {
 
     uiElements.workspace.appendChild(nodeElement);
 
-    // Add to nodes array
     data.nodes.push({
         id: nodeElement.dataset.id,
         element: nodeElement,
         command: cmd.name,
         inputs: {},
         outputs: [],
-        x: workspaceCoords.x,
-        y: workspaceCoords.y
+        x: x + scaleAwareOffset,
+        y: y
     });
 }

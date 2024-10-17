@@ -5,6 +5,14 @@ import { commands } from './commands.js';
 import { createNodeInstance } from './nodeInstance.js';
 import { createConnection } from './connections.js';
 import { updateAllConnections } from './connections.js';
+import { updateConnections } from './connections.js';
+
+const NODE_WIDTH = 200;
+const NODE_HEIGHT = 100;
+const HORIZONTAL_SPACING = 250;
+const VERTICAL_SPACING = 150;
+const INITIAL_X = 100;
+const INITIAL_Y = 50;
 
 export function initializeScriptGeneration() {
     uiElements.generateButton.addEventListener('click', function () {
@@ -21,7 +29,9 @@ export function initializeScriptGeneration() {
     uiElements.downloadButton.addEventListener('click', function () {
         const script = uiElements.outputArea.value.trim();
         if (script) {
-            downloadScript(script, 'duckyScript.txt');
+            // You can customize the prefix based on the script content or user input
+            const prefix = getScriptPrefix(script);
+            downloadScript(script, prefix);
         } else {
             alert('No script to download. Please generate the script first.');
         }
@@ -32,8 +42,77 @@ export function initializeScriptGeneration() {
             clearWorkspace();
         }
     });
-
+    initializeFileLoading();
     initializeExampleSelector();
+}
+
+// Helper function to determine a suitable prefix
+function getScriptPrefix(script) {
+    // This is a simple example. You can make this more sophisticated based on your needs.
+    if (script.includes('WINDOWS')) {
+        return 'windows_script';
+    } else if (script.includes('STRING')) {
+        return 'text_input_script';
+    } else {
+        return 'ducky_script';
+    }
+}
+
+export function initializeFileLoading() {
+    uiElements.loadFileButton.addEventListener('click', () => {
+        uiElements.fileInput.click();
+    });
+
+    uiElements.fileInput.addEventListener('change', (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const content = e.target.result;
+                loadScriptFromContent(content);
+            };
+            reader.readAsText(file);
+        }
+    });
+}
+function loadScriptFromContent(content) {
+    clearWorkspace();
+    const lines = content.split('\n');
+    let x = INITIAL_X;
+    let y = INITIAL_Y;
+    let prevNode = null;
+
+    lines.forEach((line, index) => {
+        line = line.trim();
+        if (line) {
+            const [cmd, ...args] = line.split(' ');
+            const command = commands.find(c => c.name === cmd);
+            if (command) {
+                const nodeElement = createNodeInstanceAtPosition(command, x, y, {});
+                if (args.length > 0 && command.inputs.length > 0) {
+                    const input = nodeElement.querySelector(`input[data-input="${command.inputs[0]}"]`);
+                    if (input) {
+                        input.value = args.join(' ');
+                        const nodeData = data.nodes.find(n => n.id == nodeElement.dataset.id);
+                        nodeData.inputs[command.inputs[0]] = args.join(' ');
+                    }
+                }
+                if (prevNode) {
+                    createConnection(prevNode, nodeElement);
+                }
+                prevNode = nodeElement;
+                
+                // Update x and y for next node
+                x += HORIZONTAL_SPACING;
+                if (x > INITIAL_X + HORIZONTAL_SPACING * 3) {
+                    x = INITIAL_X;
+                    y += VERTICAL_SPACING;
+                }
+            }
+        }
+    });
+
+    refreshNodePositionsAndConnections();
 }
 
 function initializeExampleSelector() {
@@ -136,57 +215,53 @@ function updateNodePositions() {
 
 function loadOpenWebsiteWindowsExample() {
     const cmds = [
-        { cmd: 'WINDOWS', x: 100, y: 50 },
-        { cmd: 'STRING', x: 300, y: 50, inputs: { text: 'r' } },
-        { cmd: 'DELAY', x: 500, y: 50, inputs: { milliseconds: '500' } },
-        { cmd: 'STRING', x: 700, y: 50, inputs: { text: 'https://www.example.com' } },
-        { cmd: 'ENTER', x: 900, y: 50 },
+        { cmd: 'WINDOWS', x: INITIAL_X, y: INITIAL_Y },
+        { cmd: 'STRING', x: INITIAL_X + HORIZONTAL_SPACING, y: INITIAL_Y, inputs: { text: 'r' } },
+        { cmd: 'DELAY', x: INITIAL_X + HORIZONTAL_SPACING * 2, y: INITIAL_Y, inputs: { milliseconds: '500' } },
+        { cmd: 'STRING', x: INITIAL_X, y: INITIAL_Y + VERTICAL_SPACING, inputs: { text: 'https://www.example.com' } },
+        { cmd: 'ENTER', x: INITIAL_X + HORIZONTAL_SPACING, y: INITIAL_Y + VERTICAL_SPACING },
     ];
-
     createNodesAndConnections(cmds);
 }
 
 function loadTextEditorPrankExample() {
     const cmds = [
-        { cmd: 'WINDOWS', x: 100, y: 50 },
-        { cmd: 'STRING', x: 300, y: 50, inputs: { text: 'notepad' } },
-        { cmd: 'ENTER', x: 500, y: 50 },
-        { cmd: 'DELAY', x: 700, y: 50, inputs: { milliseconds: '1000' } },
-        { cmd: 'STRING', x: 100, y: 150, inputs: { text: 'You\'ve been pranked!' } },
-        { cmd: 'ENTER', x: 300, y: 150 },
-        { cmd: 'STRING', x: 500, y: 150, inputs: { text: 'Your computer will explode in 5 seconds...' } },
-        { cmd: 'ENTER', x: 700, y: 150 },
-        { cmd: 'DELAY', x: 900, y: 150, inputs: { milliseconds: '5000' } },
-        { cmd: 'STRING', x: 100, y: 250, inputs: { text: 'Just kidding! Have a nice day :)' } },
+        { cmd: 'WINDOWS', x: INITIAL_X, y: INITIAL_Y },
+        { cmd: 'STRING', x: INITIAL_X + HORIZONTAL_SPACING, y: INITIAL_Y, inputs: { text: 'notepad' } },
+        { cmd: 'ENTER', x: INITIAL_X + HORIZONTAL_SPACING * 2, y: INITIAL_Y },
+        { cmd: 'DELAY', x: INITIAL_X, y: INITIAL_Y + VERTICAL_SPACING, inputs: { milliseconds: '1000' } },
+        { cmd: 'STRING', x: INITIAL_X + HORIZONTAL_SPACING, y: INITIAL_Y + VERTICAL_SPACING, inputs: { text: 'You\'ve been pranked!' } },
+        { cmd: 'ENTER', x: INITIAL_X + HORIZONTAL_SPACING * 2, y: INITIAL_Y + VERTICAL_SPACING },
+        { cmd: 'STRING', x: INITIAL_X, y: INITIAL_Y + VERTICAL_SPACING * 2, inputs: { text: 'Your computer will explode in 5 seconds...' } },
+        { cmd: 'ENTER', x: INITIAL_X + HORIZONTAL_SPACING, y: INITIAL_Y + VERTICAL_SPACING * 2 },
+        { cmd: 'DELAY', x: INITIAL_X + HORIZONTAL_SPACING * 2, y: INITIAL_Y + VERTICAL_SPACING * 2, inputs: { milliseconds: '5000' } },
+        { cmd: 'STRING', x: INITIAL_X, y: INITIAL_Y + VERTICAL_SPACING * 3, inputs: { text: 'Just kidding! Have a nice day :)' } },
     ];
-
     createNodesAndConnections(cmds);
 }
 
 function loadWifiPasswordStealerExample() {
     const cmds = [
-        { cmd: 'WINDOWS', x: 100, y: 50 },
-        { cmd: 'STRING', x: 300, y: 50, inputs: { text: 'cmd' } },
-        { cmd: 'ENTER', x: 500, y: 50 },
-        { cmd: 'DELAY', x: 700, y: 50, inputs: { milliseconds: '1000' } },
-        { cmd: 'STRING', x: 100, y: 150, inputs: { text: 'netsh wlan show profile' } },
-        { cmd: 'ENTER', x: 300, y: 150 },
-        { cmd: 'STRING', x: 500, y: 150, inputs: { text: 'netsh wlan show profile name="WIFI_NAME" key=clear' } },
-        { cmd: 'ENTER', x: 700, y: 150 },
+        { cmd: 'WINDOWS', x: INITIAL_X, y: INITIAL_Y },
+        { cmd: 'STRING', x: INITIAL_X + HORIZONTAL_SPACING, y: INITIAL_Y, inputs: { text: 'cmd' } },
+        { cmd: 'ENTER', x: INITIAL_X + HORIZONTAL_SPACING * 2, y: INITIAL_Y },
+        { cmd: 'DELAY', x: INITIAL_X, y: INITIAL_Y + VERTICAL_SPACING, inputs: { milliseconds: '1000' } },
+        { cmd: 'STRING', x: INITIAL_X + HORIZONTAL_SPACING, y: INITIAL_Y + VERTICAL_SPACING, inputs: { text: 'netsh wlan show profile' } },
+        { cmd: 'ENTER', x: INITIAL_X + HORIZONTAL_SPACING * 2, y: INITIAL_Y + VERTICAL_SPACING },
+        { cmd: 'STRING', x: INITIAL_X, y: INITIAL_Y + VERTICAL_SPACING * 2, inputs: { text: 'netsh wlan show profile name="WIFI_NAME" key=clear' } },
+        { cmd: 'ENTER', x: INITIAL_X + HORIZONTAL_SPACING, y: INITIAL_Y + VERTICAL_SPACING * 2 },
     ];
-
     createNodesAndConnections(cmds);
 }
 
 function loadRickrollExample() {
     const cmds = [
-        { cmd: 'WINDOWS', x: 100, y: 50 },
-        { cmd: 'STRING', x: 300, y: 50, inputs: { text: 'r' } },
-        { cmd: 'DELAY', x: 500, y: 50, inputs: { milliseconds: '500' } },
-        { cmd: 'STRING', x: 700, y: 50, inputs: { text: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' } },
-        { cmd: 'ENTER', x: 900, y: 50 },
+        { cmd: 'WINDOWS', x: INITIAL_X, y: INITIAL_Y },
+        { cmd: 'STRING', x: INITIAL_X + HORIZONTAL_SPACING, y: INITIAL_Y, inputs: { text: 'r' } },
+        { cmd: 'DELAY', x: INITIAL_X + HORIZONTAL_SPACING * 2, y: INITIAL_Y, inputs: { milliseconds: '500' } },
+        { cmd: 'STRING', x: INITIAL_X, y: INITIAL_Y + VERTICAL_SPACING, inputs: { text: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' } },
+        { cmd: 'ENTER', x: INITIAL_X + HORIZONTAL_SPACING, y: INITIAL_Y + VERTICAL_SPACING },
     ];
-
     createNodesAndConnections(cmds);
 }
 
@@ -207,6 +282,8 @@ function createNodeInstanceAtPosition(cmd, x, y, inputs = {}) {
     nodeElement.classList.add('node');
     nodeElement.style.left = x + 'px';
     nodeElement.style.top = y + 'px';
+    nodeElement.style.width = NODE_WIDTH + 'px';
+    nodeElement.style.height = NODE_HEIGHT + 'px';
     nodeElement.dataset.id = data.nodeIdCounter++;
     nodeElement.dataset.command = cmd.name;
 
@@ -215,14 +292,30 @@ function createNodeInstanceAtPosition(cmd, x, y, inputs = {}) {
     title.textContent = cmd.name;
     nodeElement.appendChild(title);
 
+    // Add delete button
+    const deleteButton = document.createElement('div');
+    deleteButton.classList.add('delete-button');
+    deleteButton.innerHTML = '&times;'; // Unicode for "×"
+    deleteButton.addEventListener('click', (event) => {
+        event.stopPropagation();
+        if (confirm('Are you sure you want to delete this node?')) {
+            deleteNode(nodeElement.dataset.id);
+        }
+    });
+    nodeElement.appendChild(deleteButton);
+
     // Output connector
     const outputConnector = document.createElement('div');
     outputConnector.classList.add('output-connector');
+    outputConnector.style.right = '-6px';
+    outputConnector.style.top = (NODE_HEIGHT / 2) + 'px';
     nodeElement.appendChild(outputConnector);
 
     // Input connector
     const inputConnector = document.createElement('div');
     inputConnector.classList.add('input-connector');
+    inputConnector.style.left = '-6px';
+    inputConnector.style.top = (NODE_HEIGHT / 2) + 'px';
     nodeElement.appendChild(inputConnector);
 
     const inputsContainer = document.createElement('div');
@@ -237,8 +330,8 @@ function createNodeInstanceAtPosition(cmd, x, y, inputs = {}) {
 
     // Event listeners
     nodeElement.addEventListener('mousedown', (event) => {
-        if (!event.target.classList.contains('output-connector') && 
-            !event.target.classList.contains('input-connector') && 
+        if (!event.target.classList.contains('output-connector') &&
+            !event.target.classList.contains('input-connector') &&
             event.target.tagName.toLowerCase() !== 'input') {
             selectNode(nodeElement);
             startDraggingNode(nodeElement, event);
@@ -267,15 +360,47 @@ function createNodeInstanceAtPosition(cmd, x, y, inputs = {}) {
     uiElements.workspace.appendChild(nodeElement);
 
     // Add to nodes array
-    data.nodes.push({
+    const newNode = {
         id: nodeElement.dataset.id,
         element: nodeElement,
         command: cmd.name,
         inputs: { ...inputs, connectionInput: false },
         outputs: [],
-    });
+        x: x,
+        y: y
+    };
+    data.nodes.push(newNode);
+
+    // Update connections for the new node
+    updateConnections(newNode.id);
+
+    return nodeElement;
 }
 
+// Make sure to include the deleteNode function in scriptGenerator.js
+function deleteNode(nodeId) {
+    const node = data.nodes.find(n => n.id == nodeId);
+    if (!node) return;
+
+    // Remove the node element from the DOM
+    if (node.element && node.element.parentNode) {
+        node.element.parentNode.removeChild(node.element);
+    }
+
+    // Remove all connections to and from this node
+    data.connections = data.connections.filter(conn => {
+        if (conn.from == nodeId || conn.to == nodeId) {
+            if (conn.element && conn.element.parentNode) {
+                conn.element.parentNode.removeChild(conn.element);
+            }
+            return false;
+        }
+        return true;
+    });
+
+    // Remove the node from the data structure
+    data.nodes = data.nodes.filter(n => n.id != nodeId);
+}
 function clearWorkspace() {
     uiElements.workspace.innerHTML = '';
     data.nodes = [];
@@ -393,7 +518,11 @@ function generateCommandLine(nodeData) {
     }
     return line;
 }
-function downloadScript(content, filename) {
+function downloadScript(content, filenamePrefix = 'duckyScript') {
+    const now = new Date();
+    const timestamp = now.toISOString().replace(/:/g, '-').replace(/\..+/, '');
+    const filename = `${filenamePrefix}_${timestamp}.txt`;
+
     const blob = new Blob([content], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
 
@@ -408,6 +537,7 @@ function downloadScript(content, filename) {
     URL.revokeObjectURL(url);
     document.body.removeChild(a);
 }
+
 
 import { selectNode } from './nodeSelection.js';
 import { startDraggingNode } from './nodeDragging.js';

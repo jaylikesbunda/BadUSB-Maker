@@ -19,7 +19,7 @@ You can try out the BadUSB Maker here: [https://jaylikesbunda.github.io/BadUSB-M
 
 ## Changelog
 
-For a detailed list of changes and updates, please see the [Changelog](https://github.com/jaylikesbunda/BadUSB-Maker/blob/main/changelog.txt).
+For a list of changes and updates, please see the [Changelog](https://github.com/jaylikesbunda/BadUSB-Maker/blob/main/changelog.txt).
 
 ## How to Use
 

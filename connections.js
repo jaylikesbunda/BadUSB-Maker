@@ -44,34 +44,23 @@ export function startConnection(nodeElement, event) {
 }
 
 function updateTemporaryConnection(mouseX, mouseY) {
-    if (!data.connectionStartNode || !data.temporaryConnection) {
-        console.warn('Attempted to update temporary connection, but required data is missing');
-        return;
-    }
+    if (!data.connectionStartNode) return;
+    
+    const startNodeData = data.nodes.find(n => n.id == data.connectionStartNode.dataset.id);
+    if (!startNodeData) return;
 
-    const startNode = data.nodes.find(n => n.id == data.connectionStartNode.dataset.id);
-   
-    if (!startNode || !startNode.element) {
-        console.warn('Start node or its element not found');
-        return;
-    }
-
+    // Convert mouse to workspace coords
     const workspaceRect = uiElements.workspace.getBoundingClientRect();
+    const workspaceX = (mouseX - workspaceRect.left - data.panX) / data.scale;
+    const workspaceY = (mouseY - workspaceRect.top - data.panY) / data.scale;
 
-    // Use the stored x and y values for the start node
-    const startX = startNode.x + startNode.element.offsetWidth;
-    const startY = startNode.y + startNode.element.offsetHeight / 2;
+    // Apply scale to element dimensions
+    const startX = startNodeData.x + (startNodeData.element.offsetWidth / data.scale);
+    const startY = startNodeData.y + (startNodeData.element.offsetHeight / data.scale / 2);
 
-    // Convert mouse position to workspace coordinates
-    const workspaceMouseX = (mouseX - workspaceRect.left) / data.scale - data.panX / data.scale;
-    const workspaceMouseY = (mouseY - workspaceRect.top) / data.scale - data.panY / data.scale;
-
-    // Convert both start and end points to screen coordinates
-    const { x: screenStartX, y: screenStartY } = workspaceToScreenCoordinates(startX, startY);
-    const { x: screenEndX, y: screenEndY } = workspaceToScreenCoordinates(workspaceMouseX, workspaceMouseY);
-
-    drawConnection(data.temporaryConnection, screenStartX, screenStartY, screenEndX, screenEndY);
+    drawConnection(data.temporaryConnection, startX, startY, workspaceX, workspaceY);
 }
+
 export function completeConnection(targetNode) {
     if (data.connectionStartNode && targetNode !== data.connectionStartNode) {
         const startNodeId = data.connectionStartNode.dataset.id;
@@ -213,29 +202,24 @@ function createsCycle(fromNodeId, toNodeId) {
     // Start DFS from the toNodeId
     return dfs(toNodeId);
 }
+
 export function updateAllConnections() {
     data.connections.forEach(updateConnectionPosition);
 }
-
 
 export function updateConnectionPosition(connection) {
     const fromNode = data.nodes.find(n => n.id == connection.from);
     const toNode = data.nodes.find(n => n.id == connection.to);
 
-    if (!fromNode || !toNode) {
-        console.warn('Node not found for connection:', connection);
-        return;
-    }
+    if (!fromNode || !toNode) return;
 
-    const fromX = fromNode.x + fromNode.element.offsetWidth;
-    const fromY = fromNode.y + fromNode.element.offsetHeight / 2;
+    // Scale element dimensions here too
+    const fromX = fromNode.x + (fromNode.element.offsetWidth / data.scale);
+    const fromY = fromNode.y + (fromNode.element.offsetHeight / data.scale / 2);
     const toX = toNode.x;
-    const toY = toNode.y + toNode.element.offsetHeight / 2;
+    const toY = toNode.y + (toNode.element.offsetHeight / data.scale / 2);
 
-    const { x: screenFromX, y: screenFromY } = workspaceToScreenCoordinates(fromX, fromY);
-    const { x: screenToX, y: screenToY } = workspaceToScreenCoordinates(toX, toY);
-
-    drawConnection(connection.element, screenFromX, screenFromY, screenToX, screenToY);
+    drawConnection(connection.element, fromX, fromY, toX, toY);
 }
 
 function drawConnection(element, x1, y1, x2, y2) {

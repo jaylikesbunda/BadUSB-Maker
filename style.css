@@ -94,6 +94,7 @@ header h1 {
     padding: 10px;
     overflow-y: auto;
     z-index: 20;
+    height: calc(100vh - 150px); /* Account for header/footer */
 }
 
 #node-panel h2,
@@ -122,17 +123,26 @@ header h1 {
 .node-item,
 .cluster-item {
     margin-bottom: 10px;
-    padding: 10px; /* Increased padding */
+    padding: 10px;
     border-radius: var(--border-radius);
     cursor: grab;
     text-align: center;
     color: var(--color-text);
     transition: background-color var(--transition-speed), transform 0.2s;
+    white-space: normal; /* Allow text to wrap */
+    word-wrap: break-word; /* Break long words if needed */
+    overflow-wrap: break-word; /* Modern browsers */
 }
 
 .node-item {
     background-color: #2c2c2c;
     border: 1px solid var(--color-border);
+    white-space: pre-wrap;
+    word-break: break-word;
+    min-height: 40px; /* Ensure consistent row height */
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .node-item:hover {
@@ -206,6 +216,8 @@ header h1 {
     border-radius: 6px;
     cursor: move;
     min-width: var(--node-width);
+    width: auto; /* Allow node to grow */
+    max-width: 300px; /* Maximum width before wrapping */
     color: var(--color-text);
     box-shadow: 0 4px 8px rgba(0,0,0,0.5);
     transition: border-color var(--transition-speed), box-shadow var(--transition-speed);
@@ -214,6 +226,7 @@ header h1 {
     -moz-user-select: none;
     -ms-user-select: none;
     z-index: 10;
+    overflow: visible;
 }
 
 .node.selected {
@@ -228,27 +241,43 @@ header h1 {
 }
 
 .node .inputs {
-    margin-top: 10px; /* Increased margin for better spacing */
+    margin-top: 10px;
+    width: 100%;
+    overflow: visible;
 }
 
 .node .input-field {
-    margin-bottom: 10px; /* Increased margin */
+    margin-bottom: 10px;
+    width: 100%;
+    overflow: visible;
 }
 
 .node .input-field label {
     display: block;
     font-size: 14px;
-    margin-bottom: 3px; /* Added margin for better spacing */
+    margin-bottom: 3px;
+    width: 100%;
+    overflow: visible;
+    white-space: normal;
+    word-wrap: break-word;
 }
 
 .node .input-field input {
-    width: 90%;
-    padding: 5px; /* Increased padding */
+    width: 100%; /* Changed from 90% to use full width */
+    padding: 5px;
     border: 1px solid var(--color-border);
     border-radius: 3px;
     background-color: #2c2c2c;
     color: var(--color-text);
     transition: border-color var(--transition-speed);
+    white-space: pre-wrap; /* Changed to pre-wrap to preserve spaces and newlines */
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    min-height: 30px;
+    height: auto;
+    resize: both; /* Allow both vertical and horizontal resizing */
+    overflow: visible;
+    box-sizing: border-box; /* Ensure padding doesn't add to width */
 }
 
 .node .input-field input:focus {
@@ -378,10 +407,11 @@ header h1 {
     position: fixed;
     top: 0;
     left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.7);
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
     z-index: 1000;
+    backdrop-filter: blur(3px);
 }
 
 .modal {
@@ -390,35 +420,321 @@ header h1 {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background: var(--color-modal-bg);
+    background-color: var(--color-modal-bg);
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
     z-index: 1001;
-    width: 80%;
-    max-width: 600px;
-    border-radius: 8px;
-    color: var(--color-text);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.8);
+    max-width: 80%;
+    max-height: 80vh;
+    width: 600px;
+    border: 1px solid var(--color-accent);
 }
 
 .modal-content {
     padding: var(--modal-padding);
-    position: relative;
+    color: var(--color-text);
+    overflow-y: auto;
+    max-height: calc(80vh - 40px);
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-accent) var(--color-modal-bg);
+}
+
+.modal-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+    background: var(--color-modal-bg);
+    border-radius: 4px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+    background-color: var(--color-accent);
+    border-radius: 4px;
+    border: 2px solid var(--color-modal-bg);
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+    background-color: var(--color-accent-light);
+}
+
+.modal-content h2 {
+    color: var(--color-accent);
+    margin-bottom: 20px;
+    font-size: 24px;
+}
+
+.modal-content p {
+    margin-bottom: 15px;
+    line-height: 1.6;
 }
 
 .close-button {
     position: absolute;
     right: 15px;
-    top: 10px;
-    cursor: pointer;
+    top: 15px;
     font-size: 24px;
-    color: var(--color-accent);
+    color: var(--color-text);
+    cursor: pointer;
     transition: color var(--transition-speed);
+    background: none;
+    border: none;
+    padding: 5px;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
 }
 
 .close-button:hover {
-    color: var(--color-accent-light);
+    color: var(--color-accent);
+    background-color: rgba(255, 255, 255, 0.1);
 }
 
-/* Responsive Design */
+/* Show modal and background when active */
+.modal.active,
+#modal-background.active {
+    display: block;
+}
+
+/* Example modal specific styles */
+#example-modal .example-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 15px;
+    padding: 10px 0;
+}
+
+#example-modal .example-item {
+    background-color: var(--color-node-bg);
+    padding: 15px;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--color-border);
+    cursor: pointer;
+    transition: all var(--transition-speed);
+    position: relative;
+    overflow: hidden;
+}
+
+#example-modal .example-item::after {
+    content: "Click to Load →";
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background: var(--color-accent);
+    color: var(--color-header-bg);
+    padding: 4px 8px;
+    font-size: 12px;
+    border-top-left-radius: var(--border-radius);
+    opacity: 0;
+    transform: translateY(100%);
+    transition: all var(--transition-speed);
+}
+
+#example-modal .example-item:hover {
+    border-color: var(--color-accent);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 140, 0, 0.3);
+    background-color: var(--color-node-hover-bg);
+}
+
+#example-modal .example-item:hover::after {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+#example-modal .example-item h3 {
+    color: var(--color-accent);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+#example-modal .example-item h3::before {
+    content: "📄";
+    font-size: 1.2em;
+}
+
+#example-modal .example-item p {
+    font-size: 14px;
+    margin: 0;
+    color: var(--color-text);
+    padding-bottom: 25px; /* Make room for the hover label */
+}
+
+/* Help modal specific styles */
+#help-modal .help-section {
+    margin-bottom: 25px;
+    padding: 15px;
+    border-radius: var(--border-radius);
+    background-color: var(--color-node-bg);
+    border: 1px solid var(--color-border);
+    transition: all var(--transition-speed);
+}
+
+#help-modal .help-section:hover {
+    border-color: var(--color-accent);
+    box-shadow: 0 2px 8px rgba(255, 140, 0, 0.2);
+}
+
+#help-modal .help-section h3 {
+    color: var(--color-accent);
+    margin-bottom: 15px;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+#help-modal .help-section h3::before {
+    content: "💡";
+    font-size: 1.2em;
+}
+
+#help-modal .help-section ul {
+    list-style-type: none;
+    padding-left: 20px;
+}
+
+#help-modal .help-section li {
+    margin-bottom: 10px;
+    position: relative;
+    padding: 8px;
+    border-radius: var(--border-radius);
+    transition: all var(--transition-speed);
+    cursor: default;
+}
+
+#help-modal .help-section li:hover {
+    background-color: var(--color-node-hover-bg);
+}
+
+#help-modal .help-section li::before {
+    content: "•";
+    color: var(--color-accent);
+    position: absolute;
+    left: -20px;
+    top: 8px;
+}
+
+/* Example list styles */
+#example-list {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 15px;
+    margin: 15px 0;
+}
+
+#example-list li {
+    background-color: var(--color-node-bg);
+    padding: 15px;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--color-border);
+    cursor: pointer;
+    transition: all var(--transition-speed);
+    position: relative;
+    overflow: hidden;
+    color: var(--color-text);
+}
+
+#example-list li::before {
+    content: "📄";
+    margin-right: 8px;
+    font-size: 1.2em;
+}
+
+#example-list li::after {
+    content: "Click to Load →";
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background: var(--color-accent);
+    color: var(--color-header-bg);
+    padding: 4px 8px;
+    font-size: 12px;
+    border-top-left-radius: var(--border-radius);
+    opacity: 0;
+    transform: translateY(100%);
+    transition: all var(--transition-speed);
+}
+
+#example-list li:hover {
+    border-color: var(--color-accent);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 140, 0, 0.3);
+    background-color: var(--color-node-hover-bg);
+}
+
+#example-list li:hover::after {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Help content styles */
+#help-content h3 {
+    color: var(--color-accent);
+    margin: 25px 0 15px;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--color-border);
+}
+
+#help-content h3::before {
+    content: "💡";
+    font-size: 1.2em;
+}
+
+#help-content ul {
+    list-style-type: none;
+    padding-left: 20px;
+    margin-bottom: 20px;
+}
+
+#help-content li {
+    margin-bottom: 12px;
+    position: relative;
+    padding: 8px 12px;
+    border-radius: var(--border-radius);
+    transition: all var(--transition-speed);
+    background-color: var(--color-node-bg);
+    border: 1px solid transparent;
+}
+
+#help-content li:hover {
+    background-color: var(--color-node-hover-bg);
+    border-color: var(--color-accent);
+    transform: translateX(5px);
+}
+
+#help-content li::before {
+    content: "•";
+    color: var(--color-accent);
+    position: absolute;
+    left: -20px;
+    top: 8px;
+    font-size: 20px;
+}
+
+#help-content strong {
+    color: var(--color-accent);
+    display: inline-block;
+    margin-right: 5px;
+}
+
+/* First h3 shouldn't have a top margin */
+#help-content h3:first-child {
+    margin-top: 0;
+}
+
+/* Responsive adjustments */
 @media screen and (max-width: 768px) {
     #node-panel {
         display: none;
@@ -454,5 +770,18 @@ header h1 {
         padding: 6px 10px;
         font-size: 12px;
         margin-top: 10px;
+    }
+
+    .modal {
+        width: 95%;
+        max-width: none;
+    }
+    
+    #example-list {
+        grid-template-columns: 1fr;
+    }
+    
+    #help-content li {
+        padding: 6px 10px;
     }
 }

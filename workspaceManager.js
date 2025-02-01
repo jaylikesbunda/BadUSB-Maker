@@ -63,9 +63,10 @@ export function updateWorkspaceTransform() {
 }
 
 export function screenToWorkspaceCoordinates(x, y) {
+    const workspaceRect = uiElements.workspace.getBoundingClientRect();
     return {
-        x: (x - data.panX) / data.scale,
-        y: (y - data.panY) / data.scale
+        x: (x - workspaceRect.left - data.panX) / data.scale,
+        y: (y - workspaceRect.top - data.panY) / data.scale
     };
 }
 

@@ -323,7 +323,15 @@ function createNodeInstanceAtPosition(cmd, x, y, inputs = {}) {
     cmd.inputs.forEach(inputName => {
         const inputField = document.createElement('div');
         inputField.classList.add('input-field');
-        inputField.innerHTML = `<label>${inputName}: <input type="text" data-input="${inputName}" value="${inputs[inputName] || ''}"></label>`;
+        const escapeHTML = str => str.replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        inputField.innerHTML = `
+          <label>
+            ${inputName.replace(/_/g, ' ')}: 
+            <input type="text" 
+                   data-input="${inputName}" 
+                   value="${escapeHTML(inputs[inputName] || '')}">
+          </label>
+        `;
         inputsContainer.appendChild(inputField);
     });
     nodeElement.appendChild(inputsContainer);

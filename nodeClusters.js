@@ -90,5 +90,27 @@ export const nodeClusters = [
             { command: "WINDOWS", inputs: {} },
             { command: "I", inputs: {} }
         ]
+    },
+    {
+        name: "Alt + F4 (Close Window)",
+        description: "Closes the active window",
+        nodes: [
+            { command: "ALT", inputs: { key: "F4" } }
+        ]
+    },
+    {
+        name: "Windows + R (Run)",
+        description: "Opens the Run dialog with a single command",
+        nodes: [
+            { command: "WINDOWS", inputs: { key: "r" } }
+        ]
+    },
+    {
+        name: "Ctrl + Shift + Esc",
+        description: "Opens Task Manager directly",
+        nodes: [
+            { command: "CTRL", inputs: { key: "SHIFT" } },
+            { command: "ESC", inputs: {} }
+        ]
     }
 ];
